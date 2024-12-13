@@ -1,0 +1,72 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: first-jwt-project
+
+  profiles:
+    active:
+    - local
+
+  #Database Configuration
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:postgresql://192.168.1.100:5432/InfoB
+    username: postgres
+    password: infobee12!@
+    # hikariCP property setting
+    hikari:
+      #풀의 최대 연결 수 설정
+      maximum-pool-size: 10
+      minimum-idle: 10
+      #풀이 연결을 사용할 수 있을 때까지 대기하는 최대 시간(ms)을 지정
+      connection-timeout: 5000
+      connection-init-sql: SELECT 1
+      #연결이 풀에서 유휴 상태로 있을 수 있는 최대 시간(ms)을 지정
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      #자동 커밋 끄기
+      auto-commit: true
+      #연결 풀의 이름을 지정
+      pool-name: Test HikariCP
+
+  devtools:
+    restart:
+      enabled: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  #404 같은 오류 메시지를 JSON 형태로 처리하기 위한 설정
+  web:
+    resources:
+      add-mappings: false
+
+# Mybatis 설정
+mybatis:
+  configuration:
+    cache-enabled: true
+    lazy-loading-enabled: false
+    aggressive-lazy-loading: true
+    multiple-result-sets-enabled: true
+    use-column-label: true
+    use-generated-keys: false
+    auto-mapping-behavior: PARTIAL
+    default-executor-type: SIMPLE
+    default-statement-timeout: 25000
+    map-underscore-to-camel-case: true
+    # 쿼리에서 Parameter가 null인 경우, 오류가 발생하는 것 방지  
+    jdbc-type-for-null: NULL
+  mapper-locations: classpath*:mappers/**/*.xml
+
+# JWT 정보 설정
+jwt:
+  secret: af60addca9ea3e3c099551e1b6576c9966dce0a33de879dd7e160f86dbd872ca236d6e9ee66fb6e30039fe7c345324a10f3d0741b0600fa7a45df4c6691eff4f4209767ed39f51e37717d8feecd5dd14fc34ebe619e6a29ae91d9ffe134cb5718bec0b3680d6ae7fc09e67763fe7c05d05d3ba69f47211163852633755b7f861132b0c98f8d7c1af9152d547408e676867a0a32fb525a4354180f5fb6b2dc23b5faa4155b8db63385f96259a90b6ee0e74a5b90a4f0f4fa96fafc296c64588b5c009b3829ae2e1d69a1cf7569b50a65fa553350495d18816f785f961c970c0a9cb9c8da25cc5e9fa4a3e9527a132d616b232d1ee21c3bf6dc8d9e3376e2e82c0
+  expiration:
+    access: 180000
+    refresh: 43200000

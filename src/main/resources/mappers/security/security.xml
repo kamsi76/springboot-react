@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.config.security.mapper.SecurityMapper">
+
+	<resultMap type="kr.co.infob.config.security.vo.Grant" id="resultGrant">
+		<result property="roleCd" column="ROLE_CD"/>
+		<result property="roleNm" column="ROLE_NM"/>
+	</resultMap>
+
+	<resultMap type="kr.co.infob.config.security.vo.UserDetailsVo" id="resultUserDetailsVo" extends="kr.co.infob.common.database.mapper.UserInfoMapper.resultUserInfo">
+		<collection property="roles" resultMap="resultGrant" />
+	</resultMap>
+
+	<select id="getUsername" resultMap="resultUserDetailsVo">
+		/* kr.co.infob.config.security.mapper.SecurityMapper.getUsername */
+		SELECT
+			UI.USER_ID,
+			UI.PASSWD,
+			UI.USER_NM,
+			UI.CTTPC,
+			UI.EMAIL,
+			RI.ROLE_CD,
+			RI.ROLE_NM
+		  FROM USER_INFO UI
+			LEFT JOIN USER_ROLE UR ON UI.USER_ID = UR.USER_ID
+			LEFT JOIN ROLE_INFO RI ON UR.ROLE_CD = RI.ROLE_CD
+		WHERE
+			UI.USER_ID = #{username}
+	</select>
+
+
+	<resultMap type="kr.co.infob.config.security.vo.UrlRoleMapping" id="resultUrlRoleMapping">
+		<result property="resrcUrl" column="RESRC_URL"></result>
+		<result property="roleCd" column="ROLE_CD"></result>
+	</resultMap>
+
+	<select id="selectUrlRoleMapping" resultMap="resultUrlRoleMapping">
+		/* kr.co.infob.config.security.mapper.SecurityMapper.selectUrlRoleMapping */
+		SELECT RESRC.RESRC_URL, ROLE.ROLE_CD, RESRC.RESRC_ORD, 0 ACCESS_RESRC_ORD
+		  FROM RESRC_INFO RESRC
+			  CROSS JOIN ROLE_INFO ROLE
+		WHERE ACCESS_TYPE_CD = 'COMM'
+		  AND RESRC.RESRC_USE_YN = 'Y'
+		UNION ALL
+		SELECT RESRC.RESRC_URL, ROLE.ROLE_CD, RESRC.RESRC_ORD, 0 ACCESS_RESRC_ORD
+		  FROM RESRC_INFO RESRC
+			  CROSS JOIN (
+				SELECT ROLE_CD FROM ROLE_INFO
+				UNION ALL
+				SELECT 'ANONYMOUS' ROLE_CD
+			  ) ROLE
+		WHERE ACCESS_TYPE_CD = 'ALL'
+		  AND RESRC.RESRC_USE_YN = 'Y'
+		UNION ALL
+		SELECT ACCESS_RESRC_PTTRN RESRC_URL, ROLE_CD, 1 RESRC_ORD,  ACCESS_RESRC_ORD
+		  FROM (
+			  SELECT MI.MENU_SN, ROLE_CD, MI.RESRC_SN
+			  FROM MENU_INFO MI
+				INNER JOIN MENU_ROLE MR ON MI.MENU_SN = MR.MENU_SN AND MR.READ_AUTH_YN = 'Y'
+			) MI
+			INNER JOIN RESRC_ACCESS_AUTH RAA ON MI.RESRC_SN = RAA.RESRC_SN AND RAA.ACCESS_AUTH_SE_CD = 'READ'
+		UNION ALL
+		SELECT ACCESS_RESRC_PTTRN RESRC_URL, ROLE_CD, 1 RESRC_ORD, ACCESS_RESRC_ORD
+		  FROM (
+			  SELECT MI.MENU_SN, MR.ROLE_CD, MI.RESRC_SN
+			  FROM MENU_INFO MI
+				INNER JOIN MENU_ROLE MR ON MI.MENU_SN = MR.MENU_SN AND MR.WRITE_AUTH_YN = 'Y'
+			) MI
+			INNER JOIN RESRC_ACCESS_AUTH RAA ON MI.RESRC_SN = RAA.RESRC_SN AND RAA.ACCESS_AUTH_SE_CD = 'WRITE'
+		UNION ALL
+		SELECT '/**' RESRC_URL, 'SYSADM' ROLE_CD, 99 RESRC_ORD, 99 ACCESS_RESRC_ORD
+		ORDER BY RESRC_ORD,  ACCESS_RESRC_ORD, RESRC_URL
+	</select>
+
+
+	<resultMap type="kr.co.infob.config.security.vo.MenuRoleVo" id="resultMenuRoleVo">
+		<result property="menuSn"         column="MENU_SN"/>
+		<result property="roleCd"         column="ROLE_CD"/>
+		<result property="readAuthYn"     column="READ_AUTH_YN"/>
+		<result property="writeAuthYn"    column="WRITE_AUTH_YN"/>
+		<result property="registerId"     column="REGISTER_ID"/>
+		<result property="registDttm"     column="REGIST_DTTM"/>
+		<result property="updusrId"       column="UPDUSR_ID"/>
+		<result property="updtDttm"       column="UPDT_DTTM"/>
+	</resultMap>
+
+	<resultMap type="kr.co.infob.config.security.vo.UserMenuVo" id="resultUserMenuVo">
+		<id property="menuSeq" 				column="MENU_SEQ"/>
+		<result property="parntsSeq" 		column="PARNTS_SEQ"/>
+		<result property="menuNm" 			column="MENU_NM"/>
+		<result property="menuPattrn" 		column="MENU_PATTRN"/>
+		<result property="menuUrl" 			column="MENU_URL"/>
+		<result property="menuDc" 			column="MENU_DC"/>
+		<result property="menuDepth" 		column="MENU_DEPTH"/>
+		<result property="popupYn" 			column="POPUP_YN"/>
+		<result property="useYn" 			column="USE_YN"/>
+		<result property="menuOrdr" 		column="MENU_ORDR"/>
+		<result property="visibleYn" 		column="VISIBLE_YN"/>
+		<result property="openScope" 		column="OPEN_SCOPE"/>
+		<result property="updtScope" 		column="UPDT_SCOPE"/>
+		<result property="resrceSeq" 		column="RESRCE_SEQ"/>
+		<result property="menuTyCd" 		column="MENU_TY_CD"/>
+
+		<collection property="menuRoles" resultMap="resultMenuRoleVo" />
+	</resultMap>
+
+	<select id="selectMenuByUser" resultMap="resultUserMenuVo">
+		/* kr.co.infob.config.security.mapper.SecurityMapper.selectMenuByUser */
+		SELECT *
+		  FROM (
+			WITH RECURSIVE MENU_HIERARCHY AS (
+
+				SELECT
+					MENU_SN,
+					UPPER_MENU_SN,
+					RESRC_SN,
+					MENU_NM,
+					MENU_URL,
+					MENU_LEVEL,
+					POPUP_YN,
+					USE_YN,
+					OUTPT_YN,
+					MENU_ORD
+				  FROM
+					MENU_INFO
+				WHERE
+					USE_YN = 'Y'
+					AND MENU_SN NOT IN ( SELECT UPPER_MENU_SN FROM MENU_INFO WHERE UPPER_MENU_SN IS NOT NULL)
+				UNION ALL
+
+				SELECT
+					MI.MENU_SN,
+					MI.UPPER_MENU_SN,
+					MI.RESRC_SN,
+					MI.MENU_NM,
+					MI.MENU_URL,
+					MI.MENU_LEVEL,
+					MI.POPUP_YN,
+					MI.USE_YN,
+					MI.OUTPT_YN,
+					MI.MENU_ORD
+				  FROM MENU_INFO MI
+				INNER JOIN MENU_HIERARCHY MH ON MI.MENU_SN = MH.UPPER_MENU_SN
+			)
+			SELECT
+				DISTINCT MH.MENU_SN,
+				UPPER_MENU_SN,
+				RESRC_SN,
+				MENU_NM,
+				MENU_URL,
+				MENU_LEVEL,
+				POPUP_YN,
+				USE_YN,
+				OUTPT_YN,
+				MENU_ORD
+			  FROM MENU_HIERARCHY MH
+		  ) MI
+	 		LEFT JOIN (
+					SELECT
+		            MR.MENU_SN,
+		            MR.ROLE_CD,
+		            MR.READ_AUTH_YN,
+		            MR.WRITE_AUTH_YN
+		          FROM MENU_ROLE MR
+		        WHERE
+		            MR.ROLE_CD IN (
+		                SELECT ROLE_CD
+		                FROM USER_ROLE
+		                WHERE USER_ID = #{userId}
+		            )
+		            AND (MR.READ_AUTH_YN = 'Y' OR MR.WRITE_AUTH_YN = 'Y')
+				) MR ON MI.MENU_SN = MR.MENU_SN
+		ORDER BY MENU_LEVEL, MENU_ORD
+	</select>
+</mapper>

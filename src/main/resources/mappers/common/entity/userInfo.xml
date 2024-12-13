@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.common.database.mapper.UserInfoMapper">
+
+	<resultMap type="kr.co.infob.common.database.entity.UserInfo" id="resultUserInfo">
+		<result property="userId" column="USER_ID"/>
+		<result property="passwd" column="PASSWD"/>
+		<result property="userNm" column="USER_NM"/>
+		<result property="cttpc" column="CTTPC"/>
+		<result property="email" column="EMAIL"/>
+		<result property="registDttm" column="REGIST_DTTM"/>
+		<result property="updusrId" column="UPDUSR_ID"/>
+		<result property="updtDttm" column="UPDT_DTTM"/>
+	</resultMap>
+
+	<insert id="insert">
+		/* kr.co.infob.common.mapper.UserInfoMapper.insert */
+		INSERT INTO USER_INFO (
+			USER_ID
+			,PASSWD
+			,USER_NM
+			,CTTPC
+			,EMAIL
+			,REGIST_DTTM
+			,UPDUSR_ID
+			,UPDT_DTTM
+		) VALUES (
+			#{userId},
+			,#{PASSWD}
+			,#{userNm}
+			,#{cttpc}
+			,#{email}
+			,now()
+			,#{updusrId}
+			,now()
+		)
+	</insert>
+
+	<update id="update">
+		/* kr.co.infob.common.database.mapper.UserInfoMapper.update */
+		INSERT INTO USER_INFO SET
+			USER_NM = #{userNm},
+			CTTPC = #{cttpc},
+			EMAIL = #{email},
+			UPDUSR_ID = #{userId},
+			UPDT_DTTM = now()
+		WHERE
+			USER_ID = #{userId}
+	</update>
+
+	<delete id="delete">
+		/* kr.co.infob.common.database.mapper.UserInfoMapper.delete */
+		DELETE FROM USER_INFO
+		WHERE
+			USER_ID = #{userId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.api.auth.mapper.AuthMapper">
+
+	<resultMap type="kr.co.infob.api.auth.vo.UserVo" id="resultUserVo" extends="kr.co.infob.common.database.mapper.UserInfoMapper.resultUserInfo">
+	</resultMap>
+
+	<select id="getUser" resultMap="resultUserVo">
+		/* kr.co.infob.api.mapper.AuthMapper.getUser */
+		SELECT
+			USER_ID
+			,PASSWD
+			,USER_NM
+			,CTTPC
+			,EMAIL
+			,REGIST_DTTM
+			,UPDUSR_ID
+			,UPDT_DTTM
+		  FROM USER_INFO
+		WHERE
+			USER_ID = #{userId}
+	</select>
+</mapper>

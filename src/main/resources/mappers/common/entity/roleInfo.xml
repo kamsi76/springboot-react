@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.common.database.mapper.RoleInfoMapper">
+
+	<resultMap type="kr.co.infob.common.database.entity.RoleInfo" id="resultRoleInfo">
+		<result property="roleCd"           column="ROLE_CD"/>
+		<result property="roleNm"           column="ROLE_NM"/>
+		<result property="useYn"            column="USE_YN"/>
+		<result property="registerId"       column="REGISTER_ID"/>
+		<result property="registDttm"       column="REGIST_DTTM"/>
+		<result property="updusrId"         column="UPDUSR_ID"/>
+		<result property="updtDttm"         column="UPDT_DTTM"/>
+	</resultMap>
+
+	<insert id="insert">
+		/* kr.co.infob.common.database.mapper.RoleInfoMapper.insert */
+		INSERT INTO ROLE_INFO (
+			ROLE_CD
+			,ROLE_NM
+			,USE_YN
+			,REGISTER_ID
+			,REGIST_DTTM
+			,UPDUSR_ID
+			,UPDT_DTTM
+		) VALUES (
+			#{roleCd},
+			,#{roleNm}
+			,#{useYn}
+			,#{registerId}
+			,now()
+			,#{updusrId}
+			,now()
+		)
+	</insert>
+
+	<update id="update">
+		/* kr.co.infob.common.database.mapper.RoleInfoMapper.update */
+		INSERT INTO ROLE_INFO SET
+			ROLE_NM = #{roleNm},
+			USE_YN = #{useYn},
+			UPDUSR_ID = #{updusrId},
+			UPDT_DTTM = now()
+		WHERE
+			ROLE_CD = #{roleCd}
+	</update>
+
+	<delete id="delete">
+		/* kr.co.infob.common.database.mapper.RoleInfoMapper.delete */
+		DELETE FORM ROLE_INFO
+		WHERE
+			ROLE_CD = #{roleCd}
+	</delete>
+
+</mapper>
