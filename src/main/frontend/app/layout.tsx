@@ -2,7 +2,7 @@
 
 import './globals.css'
 import { Inter } from 'next/font/google'
-import PrivateRoute from "@/app/component/router/PrivateRouter";
+import PrivateRoute from '@/components/common/router/PrivateRouter';
 
 const inter = Inter({ subsets: ['latin'] })
 

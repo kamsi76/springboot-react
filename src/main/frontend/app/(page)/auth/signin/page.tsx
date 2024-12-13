@@ -10,9 +10,9 @@ import { Label } from '@/components/ui/label'
 
 import { useRouter } from 'next/navigation'
 
-import AuthService from "@/app/component/service/Auth/AuthService";
-import { Auth } from "@/app/component/entity/Auth";
-import { fnFormValidataion } from "@/app/resources/common/validateFrom";
+import AuthService from "@/components/service/Auth/AuthService";
+import { Auth } from "@/components/entity/Auth";
+import { fnFormValidataion } from "@/components/common/validator/validateFrom";
 
 export default function Login() {
 

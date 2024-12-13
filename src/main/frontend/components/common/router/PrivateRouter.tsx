@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import AxiosJwtInstance from "../common/instance/AxiosJwtInstance";
+import AxiosJwtInstance from "../instance/AxiosJwtInstance";
 import { usePathname, useRouter } from 'next/navigation';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
