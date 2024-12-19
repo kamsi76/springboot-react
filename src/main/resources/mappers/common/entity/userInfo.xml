@@ -25,7 +25,7 @@
 			,UPDUSR_ID
 			,UPDT_DTTM
 		) VALUES (
-			#{userId},
+			#{userId}
 			,#{PASSWD}
 			,#{userNm}
 			,#{cttpc}

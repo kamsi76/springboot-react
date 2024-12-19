@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.common.database.mapper.ResrcInfoMapper">
+
+	<resultMap type="kr.co.infob.common.database.entity.ResrcInfo" id="resultResrcInfo">
+		<result property="resrcSn"          column="RESRC_SN"/>
+		<result property="resrcPttrn"       column="RESRC_PTTRN"/>
+		<result property="resrcUrl"         column="RESRC_URL"/>
+		<result property="resrcNm"          column="RESRC_NM"/>
+		<result property="resrcDc"          column="RESRC_DC"/>
+		<result property="resrcOrd"         column="RESRC_ORD"/>
+		<result property="accessTypeCd"     column="ACCESS_TYPE_CD"/>
+		<result property="resrcUseYn"       column="RESRC_USE_YN"/>
+		<result property="registerId"       column="REGISTER_ID"/>
+		<result property="registDttm"       column="REGIST_DTTM"/>
+		<result property="updusrId"         column="UPDUSR_ID"/>
+		<result property="updtDttm"         column="UPDT_DTTM"/>
+	</resultMap>
+
+	<insert id="insert">
+		/* kr.co.infob.common.database.mapper.ResrcInfoMapper.insert */
+		INSERT INTO RESRC_INFO (
+			RESRC_SN
+			, RESRC_PTTRN
+			, RESRC_URL
+			, RESRC_NM
+			, RESRC_DC
+			, RESRC_ORD
+			, ACCESS_TYPE_CD
+			, RESRC_USE_YN
+			, REGISTER_ID
+			, REGIST_DTTM
+			, UPDUSR_ID
+			, UPDT_DTTM
+		) VALUES (
+			#{resrcSn}
+			, #{resrcPttrn}
+			, #{resrcUrl}
+			, #{resrcNm}
+			, #{resrcDc}
+			, #{resrcOrd}
+			, #{accessTypeCd}
+			, #{resrcUseYn}
+			, #{registerId}
+			, now()
+			, #{updusrId}
+			, now()
+		)
+	</insert>
+
+	<update id="update">
+		/* kr.co.infob.common.database.mapper.ResrcInfoMapper.update */
+		INSERT INTO RESRC_INFO SET
+			RESRC_PTTRN = #{resrcPttrn},
+			RESRC_URL = #{resrcUrl},
+			RESRC_NM = #{resrcNm},
+			RESRC_DC = #{resrcDc},
+			RESRC_ORD = #{resrcOrd},
+			ACCESS_TYPE_CD = #{accessTypeCd},
+			RESRC_USE_YN = #{resrcUseYn},
+			UPDUSR_ID = #{updusrId},
+			UPDT_DTTM = now()
+		WHERE
+			RESRC_SN = #{resrcSn}
+	</update>
+
+	<delete id="delete">
+		/* kr.co.infob.common.database.mapper.ResrcInfoMapper.delete */
+		DELETE FROM RESRC_INFO
+		WHERE
+			RESRC_SN = #{resrcSn}
+	</delete>
+
+</mapper>

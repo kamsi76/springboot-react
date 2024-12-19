@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.api.sysmngr.menu.mapper.MenuMapper">
+
+	<resultMap type="kr.co.infob.api.sysmngr.menu.vo.MenuRoleVo" id="resultMenuRoleVo">
+		<result property="menuSn"         column="MENU_SN"/>
+		<result property="roleCd"         column="ROLE_CD"/>
+		<result property="readAuthYn"     column="READ_AUTH_YN"/>
+		<result property="writeAuthYn"    column="WRITE_AUTH_YN"/>
+	</resultMap>
+
+	<resultMap type="kr.co.infob.api.sysmngr.menu.vo.UserMenuVo" id="resultUserMenuVo">
+		<id property="menuSn" 				column="MENU_SN"/>
+		<result property="upperMenuSn" 		column="UPPER_MENU_SN"/>
+		<result property="menuNm" 			column="MENU_NM"/>
+		<result property="menuUrl" 			column="MENU_URL"/>
+		<result property="menuLevel" 		column="MENU_LEVEL"/>
+		<result property="popupYn" 			column="POPUP_YN"/>
+		<result property="useYn" 			column="USE_YN"/>
+		<result property="menuOrd" 		column="MENU_ORD"/>
+		<result property="resrcSn" 		column="RESRC_SN"/>
+
+		<collection property="menuRoles" resultMap="resultMenuRoleVo" />
+	</resultMap>
+
+	<select id="selectMenuByUser" resultMap="resultUserMenuVo">
+		/* kr.co.infob.config.security.mapper.SecurityMapper.selectMenuByUser */
+		SELECT *
+		  FROM (
+			WITH RECURSIVE MENU_HIERARCHY AS (
+
+				SELECT
+					MI.MENU_SN,
+					UPPER_MENU_SN,
+					RESRC_SN,
+					MENU_NM,
+					MENU_URL,
+					MENU_LEVEL,
+					POPUP_YN,
+					USE_YN,
+					OUTPT_YN,
+					MENU_ORD,
+					ROLE_CD,
+					READ_AUTH_YN,
+					WRITE_AUTH_YN
+				  FROM MENU_INFO MI
+					INNER JOIN (
+						SELECT
+							MENU_SN,
+							ROLE_CD,
+							READ_AUTH_YN,
+							WRITE_AUTH_YN
+						  FROM MENU_ROLE
+						WHERE
+							ROLE_CD IN (
+								SELECT ROLE_CD
+								  FROM USER_ROLE
+								WHERE
+									USER_ID = #{userId}
+							)
+					) MR ON MI.MENU_SN = MR.MENU_SN
+				WHERE
+					USE_YN = 'Y'
+					AND MI.MENU_SN NOT IN (
+						SELECT UPPER_MENU_SN
+						  FROM MENU_INFO
+						WHERE
+							UPPER_MENU_SN IS NOT NULL
+					)
+				UNION ALL
+
+				SELECT
+					MI.MENU_SN,
+					MI.UPPER_MENU_SN,
+					MI.RESRC_SN,
+					MI.MENU_NM,
+					MI.MENU_URL,
+					MI.MENU_LEVEL,
+					MI.POPUP_YN,
+					MI.USE_YN,
+					MI.OUTPT_YN,
+					MI.MENU_ORD,
+					MR.ROLE_CD,
+					MR.READ_AUTH_YN,
+					MR.WRITE_AUTH_YN
+				  FROM MENU_INFO MI
+					LEFT JOIN (
+						SELECT
+							MENU_SN,
+							ROLE_CD,
+							READ_AUTH_YN,
+							WRITE_AUTH_YN
+						  FROM MENU_ROLE
+						WHERE
+							ROLE_CD IN (
+								SELECT ROLE_CD
+								  FROM USER_ROLE
+								WHERE
+									USER_ID = #{userId}
+							)
+					) MR ON MI.MENU_SN = MR.MENU_SN
+				INNER JOIN MENU_HIERARCHY MH ON MI.MENU_SN = MH.UPPER_MENU_SN
+			)
+			SELECT
+				DISTINCT MH.MENU_SN,
+				UPPER_MENU_SN,
+				RESRC_SN,
+				MENU_NM,
+				MENU_URL,
+				MENU_LEVEL,
+				POPUP_YN,
+				USE_YN,
+				OUTPT_YN,
+				MENU_ORD,
+				ROLE_CD,
+				READ_AUTH_YN,
+				WRITE_AUTH_YN
+			  FROM MENU_HIERARCHY MH
+		  ) MI
+		ORDER BY MENU_LEVEL, MENU_ORD
+	</select>
+
+</mapper>

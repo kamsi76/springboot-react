@@ -55,16 +55,18 @@ public class AuthService {
 	 */
 	public boolean authroize(HttpServletRequest request, String path) {
 
+		log.debug("Target Path : " + path);
+
 		//사용자 정보를 조회 하여 사용자가 가지고 있는 role 정보를 조회 한다.
 		//메뉴에 대한 Role 정보를 조회한다.
 		//메뉴 Role 정보와 사용자 Role 정보가 일치하지는 겂이 없으면 false을 반환한다.
-
 		String headerAccessToken = tokenProvider.getHeaderToken(request.getHeader("Authorization"));
+		boolean validAccessToken = tokenProvider.validateToken(headerAccessToken);
 
 		UserDetailsVo userDetails = null;
 
 		//토큰이 있으면
-		if(StringUtils.hasText(headerAccessToken) ) {
+		if(StringUtils.hasText(headerAccessToken) && validAccessToken ) {
 			String username = tokenProvider.getUsernameFromToken(headerAccessToken);
 			userDetails = securityService.loadUserByUsername(username);
 		}

@@ -14,13 +14,10 @@ import kr.co.infob.api.auth.service.AuthService;
 import kr.co.infob.api.auth.vo.UserVo;
 import kr.co.infob.common.database.entity.UserInfo;
 
-//@CrossOrigin(originPatterns = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/v1")
 public class AuthController {
 
-//	private final JwtTokenProvider jwtTokenProvider;
-//    private final RedisService redisService;
 	@Resource(name="authService")
 	private AuthService authService;
 

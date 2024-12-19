@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.common.database">
+
+	<sql id="queryForPagingHeader">
+		<if test="pagination != null">
+		SELECT TABLE_FOR_PAGE2.* FROM (
+			SELECT ROWNUM AS ROWNUM_FOR_PAGE, TABLE_FOR_PAGE1.* FROM (
+		</if>
+	</sql>
+
+	<sql id="queryForPagingFooter">
+		<if test="pagination != null">
+			) TABLE_FOR_PAGE1
+			WHERE ROWNUM <![CDATA[<=]]> #{pagination.lastRecordIndex}
+		) TABLE_FOR_PAGE2
+		WHERE ROWNUM_FOR_PAGE <![CDATA[>]]> #{pagination.firstRecordIndex}
+		</if>
+	</sql>
+
+	<sql id="queryForPagingHeaderPostgreSql">
+		<if test="pagination != null">
+		</if>
+	</sql>
+
+	<sql id="queryForPagingFooterPostgreSql">
+		<if test="pagination != null">
+		LIMIT #{pagination.recordPerPage} OFFSET #{pagination.firstRecordIndex}
+		</if>
+	</sql>
+</mapper>

@@ -22,7 +22,9 @@ public class JwtTokenException extends Exception {
         BAD_ACCESS("Invalid access token."),
         NO_REFRESH("Not found refresh token."),
         BAD_REFRESH("Invalid refresh token."),
-        BLACKLIST("Blacklist refresh token.");
+        REISSUE_REFRESH("Reissue_refresh token"),
+        BLACKLIST("Blacklist refresh token."),
+        NOT_FOUND_USER("Not found user");
 
     	private final String message;
 
@@ -55,7 +57,7 @@ public class JwtTokenException extends Exception {
          * 	나머지는 올바르지 않은 요청으로 로그인 화면으로 이동하도록 처리한다.
          */
     	HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        if( "NO_ACCESS".equals(errorCase.name()) ) {
+        if( "REISSUE_REFRESH".equals(errorCase.name()) ) {
         	httpStatus = HttpStatus.UNAUTHORIZED;
         }
 

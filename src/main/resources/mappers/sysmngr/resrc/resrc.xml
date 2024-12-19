@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.co.infob.api.sysmngr.resrc.mapper.ResrcMapper">
+
+	<resultMap type="kr.co.infob.api.sysmngr.resrc.vo.ResrcVo" id="resultResrcVo" extends="kr.co.infob.common.database.mapper.ResrcInfoMapper.resultResrcInfo">
+	</resultMap>
+
+	<sql id="search">
+		<if test="searchText != null and !searchText.isEmpty()">
+			<choose>
+				<when test="'all'.equals(searchType)">
+				AND ( RESRC_NM LIKE '%'||#{searchText}||'%' OR RESRC_URL LIKE '%'||#{searchText}||'%' )
+				</when>
+				<when test="'resrcNm'.equals(searchType)">
+				AND RESRC_NM LIKE '%'||#{searchText}||'%'
+				</when>
+				<when test="'resrcUrl'.equals(searchType)">
+				AND RESRC_URL LIKE '%'||#{searchText}||'%'
+				</when>
+			</choose>
+		</if>
+	</sql>
+
+	<select id="getCount" resultType="Integer">
+		/* kr.co.infob.api.sysmngr.resrc.mapper.ResrcMapper.selectMenuByUser */
+		SELECT COUNT(1) FROM RESRC_INFO
+		<where>
+			<include refid="search" />
+		</where>
+	</select>
+
+	<select id="select" resultMap="resultResrcVo">
+		/* kr.co.infob.api.sysmngr.resrc.mapper.ResrcMapper.select */
+		<include refid="kr.co.infob.common.database.queryForPagingHeaderPostgreSql" />
+		SELECT
+			RESRC_SN
+			, RESRC_PTTRN
+			, RESRC_URL
+			, RESRC_NM
+			, RESRC_DC
+			, RESRC_ORD
+			, ACCESS_TYPE_CD
+			, RESRC_USE_YN
+			, REGISTER_ID
+			, REGIST_DTTM
+			, UPDUSR_ID
+			, UPDT_DTTM
+		  FROM RESRC_INFO
+		<where>
+			<include refid="search" />
+		</where>
+		<include refid="kr.co.infob.common.database.queryForPagingFooterPostgreSql" />
+	</select>
+
+	<select id="get" resultMap="resultResrcVo">
+		/* kr.co.infob.api.sysmngr.resrc.mapper.ResrcMapper.get */
+		SELECT
+			RESRC_SN
+			, RESRC_PTTRN
+			, RESRC_URL
+			, RESRC_NM
+			, RESRC_DC
+			, RESRC_ORD
+			, ACCESS_TYPE_CD
+			, RESRC_USE_YN
+			, REGISTER_ID
+			, REGIST_DTTM
+			, UPDUSR_ID
+			, UPDT_DTTM
+		  FROM RESRC_INFO
+		WHERE
+			RESRC_SN = #{resrcSn}
+	</select>
+
+	<select id="getExistsResrceUrl" resultType="Integer">
+		SELECT COUNT(1) FROM RESRC_INFO WHERE RESRC_PTTRN = #{resrcPttrn}
+		<if test="resrcSn != null">
+			AND RESRC_SN != #{resrcSn}
+		</if>
+	</select>
+
+</mapper>

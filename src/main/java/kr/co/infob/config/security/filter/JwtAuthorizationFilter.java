@@ -56,6 +56,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			String headerAccessToken = jwtTokenProvider.getHeaderToken(httpServletRequest.getHeader("Authorization"));
 			String headerRefreshToken = jwtTokenProvider.getHeaderToken(httpServletRequest.getHeader("x-refresh-token"));
 
+
+			boolean validAccessToken = jwtTokenProvider.validateToken(headerAccessToken);
+			boolean validRefeshToken = jwtTokenProvider.validateToken(headerRefreshToken);
+
+			// Refresh Token 유효성이 false 이면 Token 검증을 하지 않는다.
+			if( !validRefeshToken ) {
+				filterChain.doFilter(request, response);
+				return;
+			}
+
 			/*
 			 * AccessToken 또는 refreshToken이 살아 있는 경우
 			 *
@@ -73,14 +83,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 					throw new JwtTokenException(ErrorCase.BLACKLIST);
 				}
 
-				String username = null;
-				boolean validate = false;
-
-				username = jwtTokenProvider.getUsernameFromToken(headerAccessToken);
-				validate = jwtTokenProvider.validateToken(headerAccessToken);
+				String username = jwtTokenProvider.getUsernameFromToken(headerAccessToken);;
 
 				// 정상인 경우
-				if (StringUtils.hasText(username) && validate) {
+				if (StringUtils.hasText(username) && validAccessToken) {
+
+					username = jwtTokenProvider.getUsernameFromToken(headerAccessToken);
 
 					// accessToken과 headerRefreshToken을 사용하여 비교 처리해서 문제가 있는 경우 다시 로그인 처리
 					if (!validateRefresh(username, headerRefreshToken)) {
@@ -98,6 +106,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 				} else {
 
+					if (!validateRefresh(null, headerRefreshToken)) {
+						throw new JwtTokenException(ErrorCase.BAD_REFRESH);
+					}
+
 					/*
 					 * refreshToken 정보가 정상이면 accessToken을 재발급한다.
 					 */
@@ -111,7 +123,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 						// 사용자에게 전달
 						TokenVo token = TokenVo.builder().accessToken(accessToken).build();
 
-						throw new JwtTokenException(ErrorCase.NO_ACCESS, token);
+						throw new JwtTokenException(ErrorCase.REISSUE_REFRESH, token);
+					} else {
+						throw new JwtTokenException(ErrorCase.NOT_FOUND_USER);
 					}
 				}
 			}
@@ -145,10 +159,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		 * 2. AccessToken의 username 있는 경우 AccessToken username과 RefreshToken의 username이 같은지 확인
 		 */
 		String refreshUsername = jwtTokenProvider.getUsernameFromToken(headerRefreshToken);
-		boolean validate = jwtTokenProvider.validateToken(headerRefreshToken);
 
-		if (StringUtils.hasText(refreshUsername) && validate) {
-			String refreshToken = redisService.getRefreshToken(accessUsername);
+		if (StringUtils.hasText(refreshUsername) ) {
+			String refreshToken = redisService.getRefreshToken(refreshUsername);
 			if (!headerRefreshToken.equals(refreshToken)) {
 				return false;
 			}
