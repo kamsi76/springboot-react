@@ -1,9 +1,11 @@
-export namespace Token {
+interface tokenData {
+    accessToken: string;
+    refreshToken: string;
+  }
 
-    export type Token = {
-        data: any;
-        accessToken: string;
-        refreshToken: string;
-    }
-    
+export interface Token {
+    data: tokenData;
+    accessToken: string;
+    refreshToken: string;
 }
+ 

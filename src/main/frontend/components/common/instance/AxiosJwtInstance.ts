@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import CommonError from "../error/CommonError";
 
 const AxiosJwtInstance = axios.create({
@@ -39,7 +39,7 @@ AxiosJwtInstance.interceptors.request.use(
 AxiosJwtInstance.interceptors.response.use(
     (response) => {
 
-        console.log( response );
+        // console.log( response );
 
         const status = response.status;
         const responseData = response?.data;
@@ -70,6 +70,8 @@ AxiosJwtInstance.interceptors.response.use(
                  */
                 if( responseStatus === 401 ) {
                     if( responseData?.data?.accessToken ) {
+                        
+                        localStorage.setItem('accessToken', response.data.data.accessToken);
 
                         const responseConfig = {
                             ...response.config,
@@ -79,7 +81,7 @@ AxiosJwtInstance.interceptors.response.use(
                             },
                         };
 
-                        localStorage.setItem('accessToken', response.data.data.accessToken);
+                        
 
                         return AxiosJwtInstance(responseConfig);
                     } else {
@@ -102,7 +104,7 @@ AxiosJwtInstance.interceptors.response.use(
     },
 	(error) => {
 		console.log('[-] 응답이 실패한 경우 수행이 됩니다. ', error);
-		window.location.href = '/error?code=' + error.status;
+		//window.location.href = '/error?code=' + error.status;
 		//return Promise.reject(error);
 	}
 )

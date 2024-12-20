@@ -1,4 +1,10 @@
-module.exports = {
+import { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  reactStrictMode: false, // 필요시 활성화
+  publicDir: 'public',
+  swcMinify: false, // Next.js의 SWC 사용
+
   async rewrites() {
     return [
       {
@@ -7,4 +13,15 @@ module.exports = {
       },
     ];
   },
+
+  webpack: (config, { isServer }) => {
+    // Webpack 설정 확장
+    if (!isServer) {
+      config.devtool = false; // Source Map 설정
+    }
+
+    return config;
+  },
 };
+
+export default nextConfig;

@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label'
 
 import { useRouter } from 'next/navigation'
 
-import AuthService from "@/components/service/Auth/AuthService";
-import { Auth } from "@/components/entity/Auth";
+import { authService } from "@/components/service/Auth/AuthService";
+import { requestUser } from "@/components/entity/Auth";
 import { fnFormValidataion } from "@/components/common/validator/validateFrom";
 
 export default function Login() {
@@ -35,13 +35,13 @@ export default function Login() {
           throw new Error("userId is required!");
         }
 
-        const authUser : Auth.User = {
-        userId: userId,
-        passwd: passwd
+        const authUser : requestUser = {
+          userId: userId,
+          passwd: passwd
         }
 
         console.log('[+] 로그인 수행');
-        const res = await AuthService.signin(authUser);
+        const res = await authService.signin(authUser);
         console.log('[+] 로그인 성공 ', res);
         const result = res.data;
         localStorage.setItem('accessToken', result.data.accessToken);
