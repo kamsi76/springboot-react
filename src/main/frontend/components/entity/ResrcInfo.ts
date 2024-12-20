@@ -6,6 +6,7 @@ export interface resrcInfo {
     resrcDc: string | null;
     resrcOrd: number;
     accessTypeCd: string;
+    resrcTypeCd: string;
     resrcUseYn: string;
     registerId: string | null;
     registDttm: Date | null;

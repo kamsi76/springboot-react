@@ -25,8 +25,6 @@ export default function ResourceManagement() {
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page); // 현재 페이지 상태 업데이트
-        console.log(`Current page changed to: ${page}`);
-        console.log('searchRef.current', searchRef.current);
         searchRef.current?.handleSearch(undefined, page);
     };
 

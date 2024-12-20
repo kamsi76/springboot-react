@@ -25,6 +25,7 @@ export function ResourceTable({ resources, onEdit }: ResourceTableProps) {
             <TableHead>리소스명</TableHead>
             <TableHead>리소스URL</TableHead>
             <TableHead className="w-[150px]">접근권한구분</TableHead>
+            <TableHead className="w-[80px] text-center">개발구분</TableHead>
             <TableHead className="w-[80px] text-center">순서</TableHead>
             <TableHead className="w-[100px]">사용여부</TableHead>
             <TableHead className="w-[80px]"></TableHead>
